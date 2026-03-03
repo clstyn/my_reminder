@@ -27,27 +27,11 @@ class MonthYearPicker extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Previous month button
-          IconButton(
-            onPressed: () {
-              final newDate = DateTime(
-                selectedDate.year,
-                selectedDate.month - 1,
-              );
-              onDateChanged(newDate);
-            },
-            icon: const Icon(Icons.chevron_left),
-          ),
-
           // Month-Year display (tappable)
           InkWell(
             onTap: () => _showMonthYearPicker(context),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8),
-              ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -61,23 +45,6 @@ class MonthYearPicker extends StatelessWidget {
                   const Icon(Icons.arrow_drop_down, size: 24),
                 ],
               ),
-            ),
-          ),
-
-          // Next month button (disabled if would go to future)
-          IconButton(
-            onPressed: canGoNext
-                ? () {
-                    final newDate = DateTime(
-                      selectedDate.year,
-                      selectedDate.month + 1,
-                    );
-                    onDateChanged(newDate);
-                  }
-                : null,
-            icon: Icon(
-              Icons.chevron_right,
-              color: canGoNext ? null : Colors.grey.shade300,
             ),
           ),
         ],

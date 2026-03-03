@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:my_reminder/features/statistics/data/presentation/widget/completion_percentage_bar.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../data/models/reminder_model.dart';
 import '../../data/repositories/reminder_repository.dart';
 import '../../../statistics/data/repositories/completion_repository.dart';
-import '../../../statistics/data/presentation/widget/completion_percentage_bar.dart';
 import 'widgets/reminder_list_item.dart';
 import 'widgets/add_edit_reminder_modal.dart';
 import '../../../auth/presentation/screens/login_screen.dart';
@@ -214,10 +214,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Reminders'),
+        title: const Text(
+          'My Reminders',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout_rounded),
             onPressed: _handleLogout,
             tooltip: 'Logout',
           ),
