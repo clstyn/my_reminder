@@ -129,10 +129,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       selectedDay: _selectedDay,
                       completionPercentages: _completionPercentages,
                       onDaySelected: (date) {
-                        setState(() {
-                          _selectedDay = date;
-                        });
-                        _loadDayStats(date);
+                        if (_selectedDay == date) {
+                          setState(() {
+                            _selectedDay = null;
+                            _selectedDayStats = null;
+                          });
+                        } else {
+                          setState(() {
+                            _selectedDay = date;
+                          });
+                          _loadDayStats(date);
+                        }
                       },
                     ),
                   ),

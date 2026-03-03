@@ -12,7 +12,7 @@ class DayDetailBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(maxHeight: 300),
+      constraints: const BoxConstraints(maxHeight: 240),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
