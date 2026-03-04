@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'features/auth/presentation/screens/login_screen.dart';
 import 'core/seed/seed_data_helper.dart';
+import 'core/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -8,6 +9,8 @@ void main() async {
   // Seed test user data for development
   // Comment this out in production
   await _seedTestData();
+
+  await NotificationService().init();
 
   runApp(const MyApp());
 }
