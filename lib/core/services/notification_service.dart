@@ -16,6 +16,7 @@ class NotificationService {
   Future<void> init() async {
     // Initialize timezone
     tz.initializeTimeZones();
+    tz.setLocalLocation(tz.getLocation('Asia/Jakarta'));
 
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -34,12 +35,41 @@ class NotificationService {
 
     await _plugin.initialize(settings);
 
-    // Request permission (Android 13+)
+    // Create notification channel (Android 8.0+)
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'reminder_channel',
+      'Reminders',
+      description: 'Daily reminder notifications',
+      importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
+    );
+
     await _plugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >()
+        ?.createNotificationChannel(channel);
+
+    // Request permission (Android 13+)
+    final granted = await _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.requestNotificationsPermission();
+
+    // Check exact alarm permission (Android 12+)
+    final androidImpl = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    if (androidImpl != null) {
+      final canScheduleExact = await androidImpl
+          .canScheduleExactNotifications();
+      if (canScheduleExact == false) {
+        await androidImpl.requestExactAlarmsPermission();
+      }
+    }
   }
 
   /// Schedule a DAILY notification X minutes BEFORE the reminder time
@@ -57,6 +87,7 @@ class NotificationService {
 
     // Create a TZDateTime for today at the notification time
     final now = tz.TZDateTime.now(tz.local);
+
     var scheduledDate = tz.TZDateTime(
       tz.local,
       now.year,
@@ -71,27 +102,31 @@ class NotificationService {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
 
-    await _plugin.zonedSchedule(
-      id,
-      title,
-      description,
-      scheduledDate,
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'reminder_channel',
-          'Reminders',
-          channelDescription: 'Daily reminder notifications',
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
+    try {
+      await _plugin.zonedSchedule(
+        id,
+        title,
+        description,
+        scheduledDate,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'reminder_channel',
+            'Reminders',
+            channelDescription: 'Daily reminder notifications',
+            importance: Importance.high,
+            priority: Priority.high,
+            icon: '@mipmap/ic_launcher',
+          ),
+          iOS: DarwinNotificationDetails(),
         ),
-        iOS: DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.time,
-    );
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// Cancel a specific notification
